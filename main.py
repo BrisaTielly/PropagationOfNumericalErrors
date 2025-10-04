@@ -61,121 +61,122 @@ def arredondamento(numero,qtd_digitos):
                 valor = int(decimal[qtd_digitos - len(inteiro)]) + 1
                 return inteiro+'.'+decimal[0:(qtd_digitos - len(inteiro) - 1)] + str(valor)
             return inteiro+'.'+decimal[0:(qtd_digitos - len(inteiro))] #Concatenação
-        
-while True: 
-    if(acumular.lower() != 's'): 
-        n1 = float(input("Informe o primeiro valor de sua operação: "))
-        ans_exata = n1
-    else:
-        n1 = ans_aprox
-    n2 = float(input("Informe o segundo valor de sua operação: "))
-    op = input("Informe qual operação deseja realizar (+, -, *, /): ")
-    dig = int(input("Informe quantos dígitos de precisão deseja obter: "))
-    met = int(input("Informe qual método de precisão deseja utilizar (1- trucamento 2-arredondamento): "))
 
-    match(met):
-        case 1:
-            match(op):
-                case '+':
-                    valor1= float(truncamento(n1,dig))
-                    valor2= float(truncamento(n2,dig))
-                    resultado1 = soma(ans_exata,n2)
-                    print(f"Primeiro valor truncado: {valor1}")
-                    print(f"Primeiro valor truncado: {valor2}")
-                    print(f"Resultado exato: {resultado1}")
-                    resultado2 = truncamento(soma(valor1,valor2),dig)
-                    print(f"Resultado com erro: {resultado2}")
-                    print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1))}")
-                    ans_exata = float(resultado1)
-                    ans_aprox = float(resultado2)
-                case '-':
-                    valor1= float(truncamento(n1,dig))
-                    valor2= float(truncamento(n2,dig))
-                    resultado1 = subtracacao(ans_exata,n2)
-                    print(f"Primeiro valor truncado: {valor1}")
-                    print(f"Primeiro valor truncado: {valor2}")
-                    print(f"Resultado exato: {resultado1}")
-                    resultado2 = truncamento(subtracacao(valor1,valor2),dig)
-                    print(f"Resultado com erro: {resultado2}")
-                    print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1))}")
-                    ans_exata = float(resultado1)
-                    ans_aprox = float(resultado2)
-                case '*':
-                    valor1= float(truncamento(n1,dig))
-                    valor2= float(truncamento(n2,dig))
-                    resultado1 = multiplicacao(ans_exata,n2)
-                    print(f"Primeiro valor truncado: {valor1}")
-                    print(f"Primeiro valor truncado: {valor2}")
-                    print(f"Resultado exato: {resultado1}")
-                    resultado2 = truncamento(multiplicacao(valor1,valor2),dig)
-                    print(f"Resultado com erro: {resultado2}")
-                    print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1))}")
-                    ans_exata = float(resultado1)
-                    ans_aprox = float(resultado2)
-                case '/':
-                    valor1= float(truncamento(n1,dig))
-                    valor2= float(truncamento(n2,dig))
-                    resultado1 = divisao(ans_exata,n2)
-                    print(f"Primeiro valor truncado: {valor1}")
-                    print(f"Primeiro valor truncado: {valor2}")
-                    print(f"Resultado exato: {resultado1}")
-                    resultado2 = truncamento(divisao(valor1,valor2),dig)
-                    print(f"Resultado com erro: {resultado2}")
-                    print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1))}")
-                    ans_exata = float(resultado1)
-                    ans_aprox = float(resultado2)
-        case 2:
-            match(op):
-                case '+':
-                    valor1= float(arredondamento(n1,dig))
-                    valor2= float(arredondamento(n2,dig))
-                    resultado1 = soma(ans_exata,n2)
-                    print(f"Primeiro valor arredondado: {valor1}")
-                    print(f"Segundo valor arredondado: {valor2}")
-                    print(f"Resultado exato: {resultado1}")
-                    resultado2 = arredondamento(soma(valor1,valor2),dig)
-                    print(f"Resultado com erro: {resultado2}")
-                    print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1))}")
-                    ans_exata = float(resultado1)
-                    ans_aprox = float(resultado2)
-                case '-':
-                    valor1= float(arredondamento(n1,dig))
-                    valor2= float(arredondamento(n2,dig))
-                    resultado1 = subtracacao(ans_exata,n2)
-                    print(f"Primeiro valor arredondado: {valor1}")
-                    print(f"Segundo valor arredondado: {valor2}")
-                    print(f"Resultado exato: {resultado1}")
-                    resultado2 = arredondamento(subtracacao(valor1,valor2),dig)
-                    print(f"Resultado com erro: {resultado2}")
-                    print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1))}")
-                    ans_exata = float(resultado1)
-                    ans_aprox = float(resultado2)
-                case '*':
-                    valor1= float(arredondamento(n1,dig))
-                    valor2= float(arredondamento(n2,dig))
-                    resultado1 = multiplicacao(ans_exata,n2)
-                    print(f"Primeiro valor arredondado: {valor1}")
-                    print(f"Segundo valor arredondado: {valor2}")
-                    print(f"Resultado exato: {resultado1}")
-                    resultado2 = arredondamento(multiplicacao(valor1,valor2),dig)
-                    print(f"Resultado com erro: {resultado2}")
-                    print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1))}")
-                    ans_exata = float(resultado1)
-                    ans_aprox = float(resultado2)
-                case '/':
-                    valor1= float(arredondamento(n1,dig))
-                    valor2= float(arredondamento(n2,dig))
-                    resultado1 = divisao(ans_exata,n2)
-                    print(f"Primeiro valor arredondado: {valor1}")
-                    print(f"Segundo valor arredondado: {valor2}")
-                    print(f"Resultado exato: {resultado1}")
-                    resultado2 = arredondamento(divisao(valor1,valor2),dig)
-                    print(f"Resultado com erro: {resultado2}")
-                    print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1))}")
-                    ans_exata = float(resultado1)
-                    ans_aprox = float(resultado2)
+if __name__ == "__main__":
+    while True: 
+        if(acumular.lower() != 's'): 
+            n1 = float(input("Informe o primeiro valor de sua operação: "))
+            ans_exata = n1
+        else:
+            n1 = ans_aprox
+        n2 = float(input("Informe o segundo valor de sua operação: "))
+        op = input("Informe qual operação deseja realizar (+, -, *, /): ")
+        dig = int(input("Informe quantos dígitos de precisão deseja obter: "))
+        met = int(input("Informe qual método de precisão deseja utilizar (1- trucamento 2-arredondamento): "))
 
-    continuar = input("Deseja continuar realizando uma nova operação? (s/n)")
-    if continuar.lower() != 's':
-        break
-    acumular = input("Deseja acumular ultimo resultado nesta operação (s/n): ")
+        match(met):
+            case 1:
+                match(op):
+                    case '+':
+                        valor1= float(truncamento(n1,dig))
+                        valor2= float(truncamento(n2,dig))
+                        resultado1 = soma(ans_exata,n2)
+                        print(f"Primeiro valor truncado: {valor1}")
+                        print(f"Primeiro valor truncado: {valor2}")
+                        print(f"Resultado exato: {resultado1}")
+                        resultado2 = truncamento(soma(valor1,valor2),dig)
+                        print(f"Resultado com erro: {resultado2}")
+                        print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1))}")
+                        ans_exata = float(resultado1)
+                        ans_aprox = float(resultado2)
+                    case '-':
+                        valor1= float(truncamento(n1,dig))
+                        valor2= float(truncamento(n2,dig))
+                        resultado1 = subtracacao(ans_exata,n2)
+                        print(f"Primeiro valor truncado: {valor1}")
+                        print(f"Primeiro valor truncado: {valor2}")
+                        print(f"Resultado exato: {resultado1}")
+                        resultado2 = truncamento(subtracacao(valor1,valor2),dig)
+                        print(f"Resultado com erro: {resultado2}")
+                        print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1))}")
+                        ans_exata = float(resultado1)
+                        ans_aprox = float(resultado2)
+                    case '*':
+                        valor1= float(truncamento(n1,dig))
+                        valor2= float(truncamento(n2,dig))
+                        resultado1 = multiplicacao(ans_exata,n2)
+                        print(f"Primeiro valor truncado: {valor1}")
+                        print(f"Primeiro valor truncado: {valor2}")
+                        print(f"Resultado exato: {resultado1}")
+                        resultado2 = truncamento(multiplicacao(valor1,valor2),dig)
+                        print(f"Resultado com erro: {resultado2}")
+                        print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1))}")
+                        ans_exata = float(resultado1)
+                        ans_aprox = float(resultado2)
+                    case '/':
+                        valor1= float(truncamento(n1,dig))
+                        valor2= float(truncamento(n2,dig))
+                        resultado1 = divisao(ans_exata,n2)
+                        print(f"Primeiro valor truncado: {valor1}")
+                        print(f"Primeiro valor truncado: {valor2}")
+                        print(f"Resultado exato: {resultado1}")
+                        resultado2 = truncamento(divisao(valor1,valor2),dig)
+                        print(f"Resultado com erro: {resultado2}")
+                        print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1))}")
+                        ans_exata = float(resultado1)
+                        ans_aprox = float(resultado2)
+            case 2:
+                match(op):
+                    case '+':
+                        valor1= float(arredondamento(n1,dig))
+                        valor2= float(arredondamento(n2,dig))
+                        resultado1 = soma(ans_exata,n2)
+                        print(f"Primeiro valor arredondado: {valor1}")
+                        print(f"Segundo valor arredondado: {valor2}")
+                        print(f"Resultado exato: {resultado1}")
+                        resultado2 = arredondamento(soma(valor1,valor2),dig)
+                        print(f"Resultado com erro: {resultado2}")
+                        print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1))}")
+                        ans_exata = float(resultado1)
+                        ans_aprox = float(resultado2)
+                    case '-':
+                        valor1= float(arredondamento(n1,dig))
+                        valor2= float(arredondamento(n2,dig))
+                        resultado1 = subtracacao(ans_exata,n2)
+                        print(f"Primeiro valor arredondado: {valor1}")
+                        print(f"Segundo valor arredondado: {valor2}")
+                        print(f"Resultado exato: {resultado1}")
+                        resultado2 = arredondamento(subtracacao(valor1,valor2),dig)
+                        print(f"Resultado com erro: {resultado2}")
+                        print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1))}")
+                        ans_exata = float(resultado1)
+                        ans_aprox = float(resultado2)
+                    case '*':
+                        valor1= float(arredondamento(n1,dig))
+                        valor2= float(arredondamento(n2,dig))
+                        resultado1 = multiplicacao(ans_exata,n2)
+                        print(f"Primeiro valor arredondado: {valor1}")
+                        print(f"Segundo valor arredondado: {valor2}")
+                        print(f"Resultado exato: {resultado1}")
+                        resultado2 = arredondamento(multiplicacao(valor1,valor2),dig)
+                        print(f"Resultado com erro: {resultado2}")
+                        print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1))}")
+                        ans_exata = float(resultado1)
+                        ans_aprox = float(resultado2)
+                    case '/':
+                        valor1= float(arredondamento(n1,dig))
+                        valor2= float(arredondamento(n2,dig))
+                        resultado1 = divisao(ans_exata,n2)
+                        print(f"Primeiro valor arredondado: {valor1}")
+                        print(f"Segundo valor arredondado: {valor2}")
+                        print(f"Resultado exato: {resultado1}")
+                        resultado2 = arredondamento(divisao(valor1,valor2),dig)
+                        print(f"Resultado com erro: {resultado2}")
+                        print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1))}")
+                        ans_exata = float(resultado1)
+                        ans_aprox = float(resultado2)
+
+        continuar = input("Deseja continuar realizando uma nova operação? (s/n)")
+        if continuar.lower() != 's':
+            break
+        acumular = input("Deseja acumular ultimo resultado nesta operação (s/n): ")
