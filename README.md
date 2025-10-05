@@ -2,8 +2,13 @@
 
 Uma aplicação GUI em Python para calcular e simular propagação de erros numéricos, desenvolvida com PyQt6.
 
-## Imagens:
+## 🖼️ Screenshots da Aplicação
 
+### Calculadora Padrão
+![Calculadora Padrão](https://github.com/BrisaTielly/PropagationOfNumericalErrors/blob/main/images/Screenshot_120.png)
+
+### Calculadora Sequencial
+![Simulação de Propagação de Erros](https://github.com/BrisaTielly/PropagationOfNumericalErrors/blob/main/images/Screenshot_121.png)
 
 ## 📋 Pré-requisitos
 
