@@ -1,238 +1,209 @@
-from decimal import Decimal, getcontext
+import math
+# Usando o módulo decimal para evitar problemas de precisão com floats
+from decimal import Decimal, getcontext, ROUND_HALF_UP, ROUND_DOWN
 
-# Configurar precisão alta para cálculos exatos
-getcontext().prec = 50
+# Configurando uma precisão bem alta para os cálculos
+getcontext().prec = 50 
 
-ans_exata = 0
-ans_aprox = 0
-acumular = 'n'
-
-def erroAbs(resultado_aproximado,resultado_exato):
+# Funções para calcular diferentes tipos de erro
+def erroAbs(resultado_aproximado, resultado_exato):
+    """Calcula o erro absoluto - diferença simples entre os valores."""
     return abs(resultado_exato - resultado_aproximado)
 
-def erroRel(resultado_aproximado,resultado_exato):
-    return abs( (resultado_exato - resultado_aproximado) / resultado_aproximado)
+def erroRel(resultado_aproximado, resultado_exato):
+    """Calcula o erro relativo - erro em relação ao valor exato."""
+    if resultado_exato == 0:
+        return Decimal('Infinity') if resultado_aproximado != 0 else Decimal('0')
+    return (abs(resultado_exato - resultado_aproximado) / resultado_exato)
 
-def soma(n1,n2):
-    return n1+n2
+# Operações básicas que funcionam diretamente com Decimal
+def soma(n1, n2): return n1 + n2
+def subtracacao(n1, n2): return n1 - n2
+def multiplicacao(n1, n2): return n1 * n2
+def divisao(n1, n2): return n1 / n2 if n2 != 0 else Decimal('NaN')
 
-def subtracacao(n1,n2):
-    return n1-n2
-
-def multiplicacao(n1,n2):
-    return n1*n2
-
-def divisao(n1,n2):
-    return n1/n2
-
-
-def truncamento(numero,qtd_digitos): 
-    string_numero = str(numero)
-    parte = string_numero.split('.') #Extraindo numero
-    inteiro = parte[0] #Extraindo parte inteira 
-    decimal = parte[1] #Extraindo parte decimal
-    if(inteiro == '0'):
-        for i, items in enumerate(decimal):
-            if(items!='0'): #Excluindo zeros a esquerda
-                break
-        return '0.'+decimal[0:i+qtd_digitos]
-    else:
-        if(len(inteiro)>qtd_digitos):
-            return inteiro[0:qtd_digitos] + ('0'* (len(inteiro) - qtd_digitos))  #Parte inteira + completo com zeros
-        else:
-            return inteiro+'.'+decimal[0:(qtd_digitos - len(inteiro))] #Concatenação
-        
-def arredondamento(numero,qtd_digitos):
-    string_numero = str(numero)
-    # Expandir notação científica se necessário
-    if 'e' in string_numero.lower():
-        numero = float(string_numero)
-        string_numero = f"{numero:.15f}".rstrip('0')
+# Funções para controlar a precisão dos números
+def truncamento_corrigido(numero, digitos):
+    """Corta o número para manter apenas uma certa quantidade de dígitos significativos."""
+    if numero == 0:
+        return Decimal('0')
     
-    if '.' not in string_numero:
-        string_numero += '.0'
+    # Calcula quantas casas decimais precisamos para manter os dígitos significativos
+    ordem = math.floor(numero.log10())
+    casas_decimais = digitos - ordem - 1
+    quantizer = Decimal('1e-' + str(casas_decimais))
     
-    parte = string_numero.split('.') #Extraindo numero
-    inteiro = parte[0] #Extraindo parte inteira 
-    decimal = parte[1] if len(parte) > 1 else '0' #Extraindo parte decimal
+    # Aplica o truncamento (sempre para baixo)
+    return numero.quantize(quantizer, rounding=ROUND_DOWN)
+
+def arredondamento_corrigido(numero, digitos):
+    """Arredonda o número para manter uma certa quantidade de dígitos significativos."""
+    if numero == 0:
+        return Decimal('0')
     
-    if(inteiro == '0' or inteiro == '-0'):
-        for i, items in enumerate(decimal):
-            if(items!='0'): #Excluindo zeros a esquerda
-                break
-        else:
-            # Todos são zeros
-            return '0.' + '0' * qtd_digitos
+    # Mesma lógica do truncamento, mas com arredondamento
+    ordem = math.floor(numero.log10())
+    casas_decimais = digitos - ordem - 1
+    quantizer = Decimal('1e-' + str(casas_decimais))
+    
+    # Aplica o arredondamento (meio para cima)
+    return numero.quantize(quantizer, rounding=ROUND_HALF_UP)
+
+# Mapeamento dos símbolos para as funções de operação
+operacoes = {
+    '+': soma,
+    '-': subtracacao,
+    '*': multiplicacao,
+    '/': divisao
+}
+
+# Simulação de como o erro se acumula em múltiplas somas
+def propagacao_erro_soma():
+    """Mostra como pequenos erros de precisão vão se acumulando em operações repetidas."""
+    try:
+        # Pede os dados do usuário
+        numero_str = input("Informe o valor a ser somado repetidamente: ")
+        numero = Decimal(numero_str)
         
-        # Verificar se temos dígitos suficientes
-        if i+qtd_digitos > len(decimal):
-            # Adicionar zeros se necessário
-            decimal = decimal + '0' * (i + qtd_digitos + 1 - len(decimal))
+        vezes = int(input("Quantas vezes o valor deve ser somado? "))
+        dig = int(input("Informe quantos dígitos de precisão deseja utilizar: "))
+        met = int(input("Informe qual método de precisão deseja utilizar (1- truncamento 2-arredondamento): "))
+
+        # Valida as entradas
+        if vezes <= 0 or dig <= 0 or met not in [1, 2]:
+            print("Valores inválidos. O número de somas e dígitos deve ser positivo, e o método deve ser 1 ou 2.")
+            return
+
+        # Escolhe qual função de precisão usar
+        met_funcao = truncamento_corrigido if met == 1 else arredondamento_corrigido
+        met_nome = "truncamento" if met == 1 else "arredondamento"
+
+        # Calcula o resultado exato (sem erro de precisão)
+        valor_exato_total = numero * Decimal(vezes)
         
-        # Verificar se deve arredondar para cima
-        if int(decimal[i+qtd_digitos]) >= 5:
-            # Pegar os dígitos significativos e incrementar
-            digitos = decimal[i:i+qtd_digitos]
-            numero_int = int(digitos) + 1
-            digitos_str = str(numero_int)
+        # Vai somando com erro de precisão
+        soma_aproximada_atual = Decimal('0')
+
+        print("\n--- Iniciando Simulação ---")
+        for i in range(1, vezes + 1):
+            # Soma sem aplicar precisão ainda
+            soma_antes_precisao = soma_aproximada_atual + numero
+            # Aplica a precisão escolhida
+            soma_aproximada_atual = met_funcao(soma_antes_precisao, dig)
             
-            # Verificar se houve carry (ex: 9999 + 1 = 10000)
-            if len(digitos_str) > qtd_digitos:
-                # Ajustar zeros à esquerda e dígitos
-                return '0.' + '0' * (i-1) + digitos_str
+            print(f"Soma {i}: {soma_antes_precisao}. Após {met_nome}: {soma_aproximada_atual}")
+        
+        # Calcula os erros finais
+        erro_abs_final = erroAbs(soma_aproximada_atual, valor_exato_total)
+        erro_rel_final = erroRel(soma_aproximada_atual, valor_exato_total)
+        erro_rel_percent = f"{(erro_rel_final * 100):.10f}%" if erro_rel_final.is_finite() else "inf%"
+
+        # Mostra os resultados
+        print("\n--- Resultados Finais da Simulação ---")
+        print(f"Valor Exato Esperado: {valor_exato_total}")
+        print(f"Resultado Aproximado Final: {soma_aproximada_atual}")
+        print("-" * 30)
+        print(f"Erro Absoluto Total: {erro_abs_final}")
+        print(f"Erro Relativo Total: {erro_rel_final} (ou {erro_rel_percent})")
+        print("-" * 30)
+
+    except Exception as e:
+        print(f"Ocorreu um erro: {e}. Por favor, verifique os valores informados.")
+
+# Calculadora principal que compara resultados exatos vs aproximados
+def calculadora_padrao():
+    """Calculadora que mostra como a precisão afeta os resultados das operações."""
+    ans_exata_acumulada = Decimal('0')
+    ans_aprox_acumulada = Decimal('0')
+    acumular = 'n'
+
+    while True:
+        try:
+            # Pega o primeiro valor (ou usa o acumulado)
+            if acumular.lower() != 's':
+                n1 = Decimal(input("Informe o primeiro valor de sua operação: "))
             else:
-                return '0.' + '0' * i + digitos_str.zfill(qtd_digitos)
-        return '0.' + '0' * i + decimal[i:i+qtd_digitos]
-    else:
-        if(len(inteiro)>qtd_digitos):
-            if qtd_digitos < len(inteiro) and int(inteiro[qtd_digitos]) >= 5:
-                numero_int = int(inteiro[0:qtd_digitos]) + 1
-                digitos_arredondados = str(numero_int).zfill(qtd_digitos)
-                return digitos_arredondados + ('0'* (len(inteiro) - qtd_digitos))
-            return inteiro[0:qtd_digitos] + ('0'* (len(inteiro) - qtd_digitos))
-        else:
-            decimais_necessarios = qtd_digitos - len(inteiro)
-            if decimais_necessarios > len(decimal):
-                decimal = decimal + '0' * (decimais_necessarios + 1 - len(decimal))
+                n1 = ans_aprox_acumulada
+                print(f"Usando o valor acumulado aproximado como primeiro valor: {n1}")
+
+            # Pede os outros dados
+            n2 = Decimal(input("Informe o segundo valor de sua operação: "))
+            op_str = input("Informe qual operação deseja realizar (+, -, *, /): ")
+            dig = int(input("Informe quantos dígitos de precisão deseja obter: "))
+            met = int(input("Informe qual método de precisão deseja utilizar (1- trucamento 2-arredondamento): "))
+
+            # Configura as funções baseado na escolha do usuário
+            met_funcao = truncamento_corrigido if met == 1 else arredondamento_corrigido
+            op_funcao = operacoes.get(op_str)
+
+            if not op_funcao:
+                print("Operação inválida!")
+                continue
+
+            # Aplica a precisão aos números antes de fazer a operação
+            valor1_aprox = met_funcao(n1, dig)
+            valor2_aprox = met_funcao(n2, dig)
             
-            if int(decimal[decimais_necessarios]) >= 5:
-                numero_completo = inteiro + decimal[0:decimais_necessarios]
-                numero_int = int(numero_completo) + 1
-                resultado = str(numero_int)
-                if len(resultado) > len(inteiro):
-                    return resultado[0:len(inteiro)] + '.' + resultado[len(inteiro):]
-                else:
-                    return resultado + '.' + '0' * decimais_necessarios
-            return inteiro+'.'+decimal[0:decimais_necessarios]
+            # Calcula o resultado exato (sem aplicar precisão)
+            primeiro_valor_exato = ans_exata_acumulada if acumular.lower() == 's' else n1
+            resultado_exato = op_funcao(primeiro_valor_exato, n2)
+            
+            # Calcula o resultado aproximado (usando os valores com precisão limitada)
+            resultado_aprox = op_funcao(valor1_aprox, valor2_aprox)
 
-if __name__ == "__main__":
-    while True: 
-        if(acumular.lower() != 's'): 
-            n1_input = input("Informe o primeiro valor de sua operação: ")
-            n1 = float(n1_input)
-            n1_exato = Decimal(n1_input)
-            ans_exata = n1_exato
-        else:
-            n1 = ans_aprox
-            n1_exato = Decimal(str(ans_aprox))
-        n2_input = input("Informe o segundo valor de sua operação: ")
-        n2 = float(n2_input)
-        n2_exato = Decimal(n2_input)
-        op = input("Informe qual operação deseja realizar (+, -, *, /): ")
-        dig = int(input("Informe quantos dígitos de precisão deseja obter: "))
-        met = int(input("Informe qual método de precisão deseja utilizar (1- trucamento 2-arredondamento): "))
+            # Mostra os resultados
+            met_nome = "truncado" if met == 1 else "arredondado"
+            print("-" * 30)
+            print(f"Primeiro valor {met_nome}: {valor1_aprox}")
+            print(f"Segundo valor {met_nome}: {valor2_aprox}")
+            print(f"Resultado exato: {resultado_exato}")
+            print(f"Resultado com erro (aproximado): {resultado_aprox}")
+            
+            # Calcula e mostra os erros
+            erro_abs = erroAbs(resultado_aprox, resultado_exato)
+            erro_rel = erroRel(resultado_aprox, resultado_exato)
+            
+            erro_rel_percent = f"{(erro_rel * 100):.2f}%" if erro_rel.is_finite() else "inf%"
+            print(f"Erro Absoluto: {erro_abs}")
+            print(f"Erro Relativo: {erro_rel} (ou {erro_rel_percent})")
+            print("-" * 30)
 
-        match(met):
-            case 1:
-                match(op):
-                    case '+':
-                        valor1= float(truncamento(n1,dig))
-                        valor2= float(truncamento(n2,dig))
-                        resultado1_exato = ans_exata + n2_exato
-                        resultado1 = float(resultado1_exato)
-                        print(f"Primeiro valor truncado: {valor1}")
-                        print(f"Segundo valor truncado: {valor2}")
-                        print(f"Resultado exato: {resultado1_exato}")
-                        resultado2 = truncamento(soma(valor1,valor2),dig)
-                        print(f"Resultado com erro: {resultado2}")
-                        print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1_exato))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1_exato))}")
-                        ans_exata = resultado1_exato
-                        ans_aprox = float(resultado2)
-                    case '-':
-                        valor1= float(truncamento(n1,dig))
-                        valor2= float(truncamento(n2,dig))
-                        resultado1_exato = ans_exata - n2_exato
-                        resultado1 = float(resultado1_exato)
-                        print(f"Primeiro valor truncado: {valor1}")
-                        print(f"Segundo valor truncado: {valor2}")
-                        print(f"Resultado exato: {resultado1_exato}")
-                        resultado2 = truncamento(subtracacao(valor1,valor2),dig)
-                        print(f"Resultado com erro: {resultado2}")
-                        print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1_exato))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1_exato))}")
-                        ans_exata = resultado1_exato
-                        ans_aprox = float(resultado2)
-                    case '*':
-                        valor1= float(truncamento(n1,dig))
-                        valor2= float(truncamento(n2,dig))
-                        resultado1_exato = ans_exata * n2_exato
-                        resultado1 = float(resultado1_exato)
-                        print(f"Primeiro valor truncado: {valor1}")
-                        print(f"Segundo valor truncado: {valor2}")
-                        print(f"Resultado exato: {resultado1_exato}")
-                        resultado2 = truncamento(multiplicacao(valor1,valor2),dig)
-                        print(f"Resultado com erro: {resultado2}")
-                        print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1_exato))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1_exato))}")
-                        ans_exata = resultado1_exato
-                        ans_aprox = float(resultado2)
-                    case '/':
-                        valor1= float(truncamento(n1,dig))
-                        valor2= float(truncamento(n2,dig))
-                        resultado1_exato = ans_exata / n2_exato
-                        resultado1 = float(resultado1_exato)
-                        print(f"Primeiro valor truncado: {valor1}")
-                        print(f"Segundo valor truncado: {valor2}")
-                        print(f"Resultado exato: {resultado1_exato}")
-                        resultado2 = truncamento(divisao(valor1,valor2),dig)
-                        print(f"Resultado com erro: {resultado2}")
-                        print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1_exato))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1_exato))}")
-                        ans_exata = resultado1_exato
-                        ans_aprox = float(resultado2)
-            case 2:
-                match(op):
-                    case '+':
-                        valor1= float(arredondamento(n1,dig))
-                        valor2= float(arredondamento(n2,dig))
-                        resultado1_exato = ans_exata + n2_exato
-                        resultado1 = float(resultado1_exato)
-                        print(f"Primeiro valor arredondado: {valor1}")
-                        print(f"Segundo valor arredondado: {valor2}")
-                        print(f"Resultado exato: {resultado1_exato}")
-                        resultado2 = arredondamento(soma(valor1,valor2),dig)
-                        print(f"Resultado com erro: {resultado2}")
-                        print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1_exato))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1_exato))}")
-                        ans_exata = resultado1_exato
-                        ans_aprox = float(resultado2)
-                    case '-':
-                        valor1= float(arredondamento(n1,dig))
-                        valor2= float(arredondamento(n2,dig))
-                        resultado1_exato = ans_exata - n2_exato
-                        resultado1 = float(resultado1_exato)
-                        print(f"Primeiro valor arredondado: {valor1}")
-                        print(f"Segundo valor arredondado: {valor2}")
-                        print(f"Resultado exato: {resultado1_exato}")
-                        resultado2 = arredondamento(subtracacao(valor1,valor2),dig)
-                        print(f"Resultado com erro: {resultado2}")
-                        print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1_exato))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1_exato))}")
-                        ans_exata = resultado1_exato
-                        ans_aprox = float(resultado2)
-                    case '*':
-                        valor1= float(arredondamento(n1,dig))
-                        valor2= float(arredondamento(n2,dig))
-                        resultado1_exato = ans_exata * n2_exato
-                        resultado1 = float(resultado1_exato)
-                        print(f"Primeiro valor arredondado: {valor1}")
-                        print(f"Segundo valor arredondado: {valor2}")
-                        print(f"Resultado exato: {resultado1_exato}")
-                        resultado2 = arredondamento(multiplicacao(valor1,valor2),dig)
-                        print(f"Resultado com erro: {resultado2}")
-                        print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1_exato))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1_exato))}")
-                        ans_exata = resultado1_exato
-                        ans_aprox = float(resultado2)
-                    case '/':
-                        valor1= float(arredondamento(n1,dig))
-                        valor2= float(arredondamento(n2,dig))
-                        resultado1_exato = ans_exata / n2_exato
-                        resultado1 = float(resultado1_exato)
-                        print(f"Primeiro valor arredondado: {valor1}")
-                        print(f"Segundo valor arredondado: {valor2}")
-                        print(f"Resultado exato: {resultado1_exato}")
-                        resultado2 = arredondamento(divisao(valor1,valor2),dig)
-                        print(f"Resultado com erro: {resultado2}")
-                        print(f"Erro Absoluto: {erroAbs(float(resultado2),float(resultado1_exato))} ; Erro Relativo: {erroRel(float(resultado2),float(resultado1_exato))}")
-                        ans_exata = resultado1_exato
-                        ans_aprox = float(resultado2)
+            # Salva os resultados para possível acumulação
+            ans_exata_acumulada = resultado_exato
+            ans_aprox_acumulada = resultado_aprox
+            
+            # Pergunta se quer continuar
+            continuar_op = input("Deseja realizar outra operação dentro da calculadora? (s/n): ")
+            if continuar_op.lower() != 's':
+                break
+            
+            acumular = input("Deseja acumular o último resultado nesta operação (s/n): ")
 
-        continuar = input("Deseja continuar realizando uma nova operação? (s/n)")
-        if continuar.lower() != 's':
+        except Exception as e:
+            print(f"Ocorreu um erro: {e}. Por favor, verifique os valores informados.")
             break
-        acumular = input("Deseja acumular ultimo resultado nesta operação (s/n): ")
+
+# Menu principal do programa
+def main():
+    """Função principal que mostra o menu e chama as outras funções."""
+    while True:
+        print("\n===== CALCULADORA DE ERROS NUMÉRICOS =====")
+        print("1. Calculadora de Operação Padrão")
+        print("2. Simular Propagação de Erro em Somas")
+        print("3. Sair")
+        
+        escolha = input("Escolha uma opção: ")
+
+        if escolha == '1':
+            calculadora_padrao()
+        elif escolha == '2':
+            propagacao_erro_soma()
+        elif escolha == '3':
+            print("Encerrando o programa.")
+            break
+        else:
+            print("Opção inválida! Por favor, escolha 1, 2 ou 3.")
+
+# Inicia o programa quando executado diretamente
+if __name__ == "__main__":
+    main()
