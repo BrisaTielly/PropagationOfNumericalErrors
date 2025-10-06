@@ -31,7 +31,14 @@ def truncamento_corrigido(numero, digitos):
     # Calcula quantas casas decimais precisamos para manter os dígitos significativos
     ordem = math.floor(numero.log10())
     casas_decimais = digitos - ordem - 1
-    quantizer = Decimal('1e-' + str(casas_decimais))
+    
+    # Se casas_decimais for negativo, significa que precisamos arredondar para múltiplos de 10
+    if casas_decimais < 0:
+        # Para 1 dígito significativo em números como 12.2, queremos 10
+        # Para 1 dígito significativo em números como 123.4, queremos 100
+        quantizer = Decimal('1e' + str(-casas_decimais))
+    else:
+        quantizer = Decimal('1e-' + str(casas_decimais))
     
     # Aplica o truncamento (sempre para baixo)
     return numero.quantize(quantizer, rounding=ROUND_DOWN)
@@ -44,7 +51,14 @@ def arredondamento_corrigido(numero, digitos):
     # Mesma lógica do truncamento, mas com arredondamento
     ordem = math.floor(numero.log10())
     casas_decimais = digitos - ordem - 1
-    quantizer = Decimal('1e-' + str(casas_decimais))
+    
+    # Se casas_decimais for negativo, significa que precisamos arredondar para múltiplos de 10
+    if casas_decimais < 0:
+        # Para 1 dígito significativo em números como 12.2, queremos 10
+        # Para 1 dígito significativo em números como 123.4, queremos 100
+        quantizer = Decimal('1e' + str(-casas_decimais))
+    else:
+        quantizer = Decimal('1e-' + str(casas_decimais))
     
     # Aplica o arredondamento (meio para cima)
     return numero.quantize(quantizer, rounding=ROUND_HALF_UP)

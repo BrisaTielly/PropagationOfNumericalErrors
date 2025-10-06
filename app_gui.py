@@ -210,6 +210,12 @@ class CalculadoraErrosGUI(QWidget):
             dig = self.calc_digitos.value()
             
             met_funcao = cl.truncamento_corrigido if self.calc_trunc.isChecked() else cl.arredondamento_corrigido
+            
+            # Verifica se a operação é válida
+            if op_str not in cl.operacoes:
+                QMessageBox.critical(self, "Erro de Operação", f"Operação '{op_str}' não é válida.")
+                return
+                
             op_funcao = cl.operacoes[op_str]
 
             valor1_aprox = met_funcao(n1, dig)
@@ -235,6 +241,10 @@ class CalculadoraErrosGUI(QWidget):
 
         except InvalidOperation:
             QMessageBox.critical(self, "Erro de Entrada", "Por favor, insira valores numéricos válidos.")
+        except ValueError:
+            QMessageBox.critical(self, "Erro de Entrada", "Por favor, insira valores numéricos válidos.")
+        except ZeroDivisionError:
+            QMessageBox.critical(self, "Erro de Divisão", "Não é possível dividir por zero.")
         except Exception as e:
             QMessageBox.critical(self, "Erro Inesperado", f"Ocorreu um erro: {e}")
 
