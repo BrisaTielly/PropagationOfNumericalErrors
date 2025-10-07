@@ -12,9 +12,9 @@ def erroAbs(resultado_aproximado, resultado_exato):
 
 def erroRel(resultado_aproximado, resultado_exato):
     """Calcula o erro relativo - erro em relação ao valor exato."""
-    if resultado_exato == 0:
-        return Decimal('Infinity') if resultado_aproximado != 0 else Decimal('0')
-    return (abs(resultado_exato - resultado_aproximado) / resultado_aproximado)
+    if resultado_aproximado == 0:
+        return Decimal('Infinity') if resultado_exato != 0 else Decimal('0')
+    return (abs(resultado_exato - resultado_aproximado) / abs(resultado_aproximado))
 
 # Operações básicas que funcionam diretamente com Decimal
 def soma(n1, n2): return n1 + n2
@@ -33,6 +33,9 @@ def truncamento_corrigido(numero, digitos):
     casas_decimais = digitos - ordem - 1
     
     # Se casas_decimais for negativo, significa que precisamos arredondar para múltiplos de 10
+#     Quando casas_decimais < 0, significa que precisamos "cortar" dígitos
+# A forma mais natural é arredondar para múltiplos de potências de 10
+# Isso mantém a precisão relativa
     if casas_decimais < 0:
         # Para 1 dígito significativo em números como 12.2, queremos 10
         # Para 1 dígito significativo em números como 123.4, queremos 100

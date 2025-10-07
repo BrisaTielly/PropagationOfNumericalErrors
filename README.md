@@ -71,6 +71,11 @@ python app_gui.py
 python main.py
 ```
 
+**Opção 4 - Executar testes automatizados:**
+```bash
+python tests/automated_test.py
+```
+
 ## 🎯 Funcionalidades
 
 ### Calculadora Padrão
@@ -85,6 +90,20 @@ python main.py
 - Log detalhado dos primeiros 100 passos
 - Comparação entre resultado exato e aproximado
 
+## 🧪 Testes Automatizados
+
+### Testes Visuais da GUI
+- **`tests/automated_test.py`**: Suite de testes automatizados que executa validações visuais da interface gráfica
+- Executa 9 testes abrangentes cobrindo todas as funcionalidades principais
+- Valida cálculos de erro, truncamento, arredondamento e propagação de erros
+- Mostra resultados em tempo real na GUI e no console
+- Baseado nos casos de teste documentados em `tests/README.md`
+
+### Casos de Teste Documentados
+- **`tests/README.md`**: Documentação detalhada dos casos de teste utilizados
+- Inclui exemplos práticos com cálculos manuais passo a passo
+- Cobre operações básicas, cancelamento subtrativo e propagação de erros
+- Valida precisão de 4 dígitos significativos com truncamento e arredondamento
 
 ## 📁 Estrutura do Projeto
 
@@ -94,6 +113,9 @@ python main.py
 ├── requirements.txt    # Dependências do projeto
 ├── .venv/              # Ambiente virtual (criado automaticamente)
 ├── images/             # Diretório para ícones e imagens
+├── tests/              # Diretório de testes automatizados
+│   ├── automated_test.py  # Suite de testes visuais da GUI
+│   └── README.md          # Documentação dos casos de teste
 └── README.md          # Este arquivo
 ```
 
@@ -108,6 +130,8 @@ python main.py
 - A GUI (`app_gui.py`) é apenas a interface visual que utiliza as funções do `main.py`
 - A aplicação funciona melhor em sistemas com fontes modernas instaladas
 - **Importante**: Para Python 3.13+, use PyQt6 versão 6.9.1 ou superior para evitar problemas de DLL
+- Os testes automatizados validam a precisão dos cálculos conforme documentado em `tests/README.md`
+- Execute `python tests/automated_test.py` para verificar se a aplicação está funcionando corretamente
 
 ## 🐛 Solução de Problemas
 
